@@ -19,16 +19,16 @@ public class ProjectFileWriter {
         this.dbName = projectName;
     }
 
-    public void createProjecFolder(ArrayList<Controller> controllers){
+    public void createProjecFolder(ArrayList<MvcController> mvcControllers){
         createDir(this.projecFolder);
-        createDir(this.projecFolder + "controllers\\");
+        createDir(this.projecFolder + "mvcControllers\\");
         createDir(this.projecFolder + "models\\");
         createDir(this.projecFolder + "views\\");
         createDir(this.projecFolder + "databaseScripts\\");
         createDir(this.projecFolder + "css\\");
         createDir(this.projecFolder + "js\\");
-        for (Controller controller: controllers) {
-            createDir(this.projecFolder + "views\\" + controller.getName().toLowerCase());
+        for (MvcController mvcController : mvcControllers) {
+            createDir(this.projecFolder + "views\\" + mvcController.getName().toLowerCase());
         }
     }
 
@@ -42,9 +42,9 @@ public class ProjectFileWriter {
             File file;
             if(objectClass == "MvcObject"){
                 file = new File(projecFolder + "models\\" + name + ".php");
-            }else if(objectClass == "Controller"){
-                file = new File(projecFolder + "controllers\\" + name + "Controller.php");
-                Controller crtl = (Controller) mvcTopObject;
+            }else if(objectClass == "MvcController"){
+                file = new File(projecFolder + "controllers\\" + name + "MvcController.php");
+                MvcController crtl = (MvcController) mvcTopObject;
                 for (String[] function : crtl.getFunctions()) {
                     if(function[1] == "render"){
                         writeEmptyFile(projecFolder + "views\\" + name.toLowerCase() + "\\", function[0] + ".php");

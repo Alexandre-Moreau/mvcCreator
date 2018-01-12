@@ -5,7 +5,7 @@ public class Main {
         ProjectFileWriter fileWriter = new ProjectFileWriter("H:\\wamp64\\www", "monProjet");
 
         ArrayList<MvcObject> objects = new ArrayList<>();
-        ArrayList<Controller> controllers = new ArrayList<>();
+        ArrayList<MvcController> mvcControllers = new ArrayList<>();
         ArrayList<String> fileNames = new ArrayList<>();
         fileNames.add("index");
         fileNames.add("db");
@@ -17,9 +17,9 @@ public class Main {
         fileNamesHtml.add("header");
         fileNamesHtml.add("footer");
 
-        controllers.add(new Controller("Site", new ArrayList<>(){{add(new String[]{"index", "render", "empty"});}}));
+        mvcControllers.add(new MvcController("Site", new ArrayList<>(){{add(new String[]{"index", "render", "empty"});}}));
 
-        fileWriter.createProjecFolder(controllers);
+        fileWriter.createProjecFolder(mvcControllers);
 
         MvcObject client = new MvcObject("Client");
         client.addAtribute(new String[]{"nom","string"});
@@ -34,8 +34,8 @@ public class Main {
         objects.add(produit);
 
 
-        for (Controller controller: controllers){
-            fileWriter.write(controller);
+        for (MvcController mvcController : mvcControllers){
+            fileWriter.write(mvcController);
         }
 
         for (MvcObject object: objects){

@@ -5,7 +5,7 @@ public abstract class MvcFiles {
         content += "$data = null;\n";
         content += "$option = null;\n";
         content += "\n";
-        content += "class Controller{\n";
+        content += "class MvcController{\n";
         content += "\n";
         content += "\tpublic function __construct() {\n";
         content += "\t}\n";
@@ -16,7 +16,7 @@ public abstract class MvcFiles {
         content += "\n";
         content += "\t\t$controller = get_class($this);\n";
         content += "\t\t$model = substr($controller, 0,\n";
-        content += "\t\tstrpos($controller, \"Controller\"));\n";
+        content += "\t\tstrpos($controller, \"MvcController\"));\n";
         content += "\t\t$data = $d;\n";
         content += "\t\t$globOption = $option;\n";
         content += "\t\tinclude_once \"views/\".strtolower($model).\"/\".$view.\".php\";\n";
@@ -131,7 +131,7 @@ public abstract class MvcFiles {
         content += "\t\tlist($controller, $action) = array($route, \"index\");\n";
         content += "\telse\n";
         content += "\t\tlist($controller, $action) = explode(\"/\", $route);\n";
-        content += "\t$controller = ucfirst($controller).\"Controller\";\n";
+        content += "\t$controller = ucfirst($controller).\"MvcController\";\n";
         content += "\t$c = new $controller();\n";
         content += "\t$c->$action();\n";
         content += "} else {\n";
@@ -145,7 +145,7 @@ public abstract class MvcFiles {
         String content = "";
         content += "function __autoload($name) {\n";
         content += "\t$dir = \"models\";\n";
-        content += "\tif (strpos($name,\"Controller\") !== FALSE)\n";
+        content += "\tif (strpos($name,\"MvcController\") !== FALSE)\n";
         content += "\t\t$dir = \"controllers\";\n";
         content += "\tinclude_once $dir.\"/\".$name.\".php\";\n";
         content += "}\n";

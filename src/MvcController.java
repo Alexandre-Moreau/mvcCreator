@@ -1,14 +1,14 @@
 import java.util.ArrayList;
 
-public class Controller extends MvcTopObject {
+public class MvcController extends MvcTopObject {
     private String name;
     private ArrayList<String[]> functions = new ArrayList<String[]>(); // name, type (render), viewBase (form, empty, none)
 
-    public Controller(String name) {
+    public MvcController(String name) {
         this.name = name;
     }
 
-    public Controller(String name, ArrayList<String[]> functions) {
+    public MvcController(String name, ArrayList<String[]> functions) {
         this.name = name;
         this.functions = functions;
     }
@@ -36,7 +36,7 @@ public class Controller extends MvcTopObject {
 
     public String toString(){
         String content = "";
-        content += "class " + this.name + "Controller extends Controller{\n";
+        content += "class " + this.name + "MvcController extends MvcController{\n";
         for (String[] function: this.functions){
             content += "\tpublic function " + function[0] + "(){\n";
             if(function[1] == "render"){
