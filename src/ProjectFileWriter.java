@@ -8,6 +8,7 @@ public class ProjectFileWriter {
     String dbName;
     String dbUser = "root";
     String dbPassword = "";
+    ArrayList<MvcController> controllers = new ArrayList<>();
 
     public ProjectFileWriter(String projectName) {
         this.projecFolder = System.getProperty("user.home") + "\\" +"Desktop\\" + projectName + "\\";
@@ -21,7 +22,7 @@ public class ProjectFileWriter {
 
     public void createProjecFolder(ArrayList<MvcController> mvcControllers){
         createDir(this.projecFolder);
-        createDir(this.projecFolder + "mvcControllers\\");
+        createDir(this.projecFolder + "controllers\\");
         createDir(this.projecFolder + "models\\");
         createDir(this.projecFolder + "views\\");
         createDir(this.projecFolder + "databaseScripts\\");
@@ -37,24 +38,27 @@ public class ProjectFileWriter {
         String name = mvcTopObject.getName().substring(0, 1).toLowerCase() + mvcTopObject.getName().substring(1);
         String rawContent = mvcTopObject.toString();
         String[] content = rawContent.split("\n");
-        String[] childFiles;
         try{
             File file;
             if(objectClass == "MvcObject"){
                 file = new File(projecFolder + "models\\" + name + ".php");
             }else if(objectClass == "MvcController"){
-                file = new File(projecFolder + "controllers\\" + name + "MvcController.php");
+                file = new File(projecFolder + "controllers\\" + name + "Controller.php");
                 MvcController crtl = (MvcController) mvcTopObject;
                 for (String[] function : crtl.getFunctions()) {
                     if(function[1] == "render"){
-                        writeEmptyFile(projecFolder + "views\\" + name.toLowerCase() + "\\", function[0] + ".php");
+                        if(crtl.getName() != "Site"){
+                            writeSimpleView(function, crtl.getObject());
+                        }else{
+                            writeEmptyFile(projecFolder + "views\\" + "site\\", "index.php");
+                        }
                     }
                 }
             }else{
                 throw new Exception("Bad mvcTopObject type");
             }
             if (file.exists()) {
-                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " create file " + name + " : file overwritten");
+                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " write " + file.getName() + " : file overwritten");
             }else{
                 System.out.println("create file " + file.getName());
             }
@@ -118,7 +122,7 @@ public class ProjectFileWriter {
                     throw new Exception("Bad parameter");
             }
             if (file.exists()) {
-                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " create file " + file.getName() + " : file overwritten");
+                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " writeFile " + file.getName() + " : file overwritten");
             }else{
                 System.out.println("create file " + file.getName());
             }
@@ -155,14 +159,18 @@ public class ProjectFileWriter {
                     break;
                 case "header":
                     file = new File(projecFolder + "views\\" +   "header.php");
-                    rawContent = MvcFiles.header();
+                    if(!this.controllers.isEmpty()){
+                        rawContent = MvcFiles.header(this.controllers);
+                    }else{
+                        rawContent = MvcFiles.header();
+                    }
                     content = rawContent.split("\n");
                     break;
                 default:
                     throw new Exception("Bad parameter");
             }
             if (file.exists()) {
-                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " create file " + file.getName() + " : file overwritten");
+                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " writeFileHtml " + file.getName() + " : file overwritten");
             }else{
                 System.out.println("create file " + file.getName());
             }
@@ -176,28 +184,53 @@ public class ProjectFileWriter {
             }
             bw.flush();
             bw.close();
-        }catch(Exception e){
-            System.out.println(Colors.COLOR_ERROR + "error" + Colors.COLOR_RESET + " create file \"" + fileName + "\" : " + e.getMessage());
+        }catch(Exception e) {
+            System.out.println(Colors.COLOR_ERROR + "error" + Colors.COLOR_RESET + " writeFileHtml \"" + fileName + "\" : " + e.getMessage());
         }
     }
 
-    public void writeEmptyFile(String folder, String name){
+    public void writeSimpleView(String[]function, MvcObject object){
         try{
-            File file = new File(folder + "\\" + name);
+            File file = new File(projecFolder + "views\\" + object.getName().toLowerCase() + "\\" + function[2] + function[0].substring(0, 1).toUpperCase() + function[0].substring(1) + ".php");
             if (file.exists()) {
-                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " create file " + file.getName() + " : file overwritten");
+                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " writeSimpleView " + file.getName() + " : file overwritten");
             }else{
                 System.out.println("create file " + file.getName());
             }
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
-            //bw.write("/* <!--Auto-generated file--> */");
-            bw.write("/*" + name + "*/");
+            String rawContent;
+            String[] content;
+            switch (function[2]){
+                case "form":
+                    rawContent = MvcFiles.formView(object);
+                    content = rawContent.split("\n");
+                    break;
+                case "table":
+                    rawContent = MvcFiles.tableView(object);
+                    content = rawContent.split("\n");
+                    break;
+                case "empty":
+                    rawContent = "";
+                    content = rawContent.split("\n");
+                    break;
+                case "none":
+                    rawContent = "";
+                    content = rawContent.split("\n");
+                    break;
+                default:
+                    rawContent = "";
+                    content = rawContent.split("\n");
+            }
             bw.newLine();
+            for (String line: content) {
+                bw.write(line);
+                bw.newLine();
+            }
             bw.flush();
             bw.close();
         }catch(Exception e){
-            System.out.println(Colors.COLOR_ERROR + "error" + Colors.COLOR_RESET + " create file \"" + folder + "\\" + name + "\" : " + e.getMessage());
+            System.out.println(Colors.COLOR_ERROR + "error" + Colors.COLOR_RESET + " writeSimpleView \"" + 	object.getName() + "\\" + function[0] + "\" : " + e.getMessage());
         }
     }
 
@@ -205,7 +238,7 @@ public class ProjectFileWriter {
         try {
             File file = new File(this.projecFolder + "databaseScripts\\" + "create.sql");
             if (file.exists()) {
-                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " create file " + file.getName() + " : file overwritten");
+                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " writeSql " + file.getName() + " : file overwritten");
             } else {
                 System.out.println("create file " + file.getName());
             }
@@ -234,6 +267,26 @@ public class ProjectFileWriter {
         }
     }
 
+    public void writeEmptyFile(String folder, String name){
+        try{
+            File file = new File(folder + "\\" + name);
+            if (file.exists()) {
+                System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " writeEmptyFile " + file.getName() + " : file overwritten");
+            }else{
+                System.out.println("create file " + file.getName());
+            }
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            //bw.write("/* <!--Auto-generated file--> */");
+            bw.write("/*" + name + "*/");
+            bw.newLine();
+            bw.flush();
+            bw.close();
+        }catch(Exception e){
+            System.out.println(Colors.COLOR_ERROR + "error" + Colors.COLOR_RESET + " writeEmptyFile \"" + folder + "\\" + name + "\" : " + e.getMessage());
+        }
+    }
+
     private void createDir(String name){
         File projecDir = new File(name);
         boolean result = false;
@@ -252,6 +305,10 @@ public class ProjectFileWriter {
         }else{
             System.out.println(Colors.COLOR_WARNING + "warning" + Colors.COLOR_RESET + " create directory " + name + " : folder exists");
         }
+    }
+
+    public void setControllers(ArrayList<MvcController> controllers) {
+        this.controllers = controllers;
     }
 
 

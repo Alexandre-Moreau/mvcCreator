@@ -2,7 +2,8 @@ import java.util.ArrayList;
 
 public class MvcController extends MvcTopObject {
     private String name;
-    private ArrayList<String[]> functions = new ArrayList<String[]>(); // name, type (render), viewBase (form, empty, none)
+    private ArrayList<String[]> functions = new ArrayList<String[]>(); // name, type (render), viewBase (form, table, empty, none)
+    private MvcObject object = null;
 
     public MvcController(String name) {
         this.name = name;
@@ -34,15 +35,26 @@ public class MvcController extends MvcTopObject {
         this.functions.add(function);
     }
 
+    public MvcObject getObject() {
+        return object;
+    }
+
+    public void setObject(MvcObject object) {
+        this.object = object;
+    }
+
     public String toString(){
         String content = "";
-        content += "class " + this.name + "MvcController extends MvcController{\n";
+        content += "class " + this.name + "Controller extends Controller{\n";
         for (String[] function: this.functions){
             content += "\tpublic function " + function[0] + "(){\n";
             if(function[1] == "render"){
                 switch (function[2]){
                     case "form":
                         content += "\t\t$this->render(\"form" + function[0] + "\");\n";
+                        break;
+                    case "table":
+                        content += "\t\t$this->render(\"table" + function[0] + "\");\n";
                         break;
                     case "empty":
                         content += "\t\t$this->render(\"" + function[0] + "\");\n";
@@ -56,4 +68,5 @@ public class MvcController extends MvcTopObject {
         content += "}";
         return content;
     }
+
 }

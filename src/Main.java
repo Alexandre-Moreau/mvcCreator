@@ -5,7 +5,8 @@ public class Main {
         ProjectFileWriter fileWriter = new ProjectFileWriter("H:\\wamp64\\www", "monProjet");
 
         ArrayList<MvcObject> objects = new ArrayList<>();
-        ArrayList<MvcController> mvcControllers = new ArrayList<>();
+        ArrayList<MvcController> controllers = new ArrayList<>();
+        fileWriter.setControllers(controllers); //Commenter pour retirer la liste du header
         ArrayList<String> fileNames = new ArrayList<>();
         fileNames.add("index");
         fileNames.add("db");
@@ -17,9 +18,9 @@ public class Main {
         fileNamesHtml.add("header");
         fileNamesHtml.add("footer");
 
-        mvcControllers.add(new MvcController("Site", new ArrayList<>(){{add(new String[]{"index", "render", "empty"});}}));
+        controllers.add(new MvcController("Site", new ArrayList<>(){{add(new String[]{"index", "render", "empty"});}}));
 
-        fileWriter.createProjecFolder(mvcControllers);
+        // --
 
         MvcObject client = new MvcObject("Client");
         client.addAtribute(new String[]{"nom","string"});
@@ -33,8 +34,13 @@ public class Main {
         produit.addAtribute(new String[]{"prix","int"});
         objects.add(produit);
 
+        MvcTopObject.createControllersFromObjects(controllers, objects);
 
-        for (MvcController mvcController : mvcControllers){
+        // --
+
+        fileWriter.createProjecFolder(controllers);
+
+        for (MvcController mvcController : controllers){
             fileWriter.write(mvcController);
         }
 
