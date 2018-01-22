@@ -185,7 +185,27 @@ public abstract class MvcFiles {
 
     public static String formView(MvcObject object){
         String content = "";
-        content += "form "+ object.getName() + "\n";
+        content += "<?php\n";
+        content += "\tif(isset($data['erreursSaisie'])){\n";
+        content += "\t\techo \"<p class='erreursSaisie'>Il y a des erreurs de saisie:<br/>\";\n";
+        content += "\t\t\tforeach($data['erreursSaisie'] as $erreurSaisie){\n";
+        content += "\t\techo \"-\".$erreurSaisie.\"<br/>\";\n";
+        content += "\t}\n";
+        content += "\techo \"</p>\";\n";
+        content += "}\n";
+        content += "?>\n";
+        content += "<form action='./?r=" + object.getName() + "/create' method='post'>\n";
+        for (String[] attr: object.getAttributes()){
+            content += "\t<label for='" + attr[0] + "'>" + attr[0] + " : <span class='requis'>*</span></label>\n";
+            content += "\t<input type='text' name='" + attr[0] + "' id='" + attr[0] + "' <?php if(isset($_POST['" + attr[0] + "'])){echo \"value='\".$_POST['" + attr[0] + "'].\"'\";} ?> />\n";
+        }
+        content += "\t<div class=\"form_boutons\">\n";
+        content += "\t\t<input type='submit' name='submit' value='Confirmer' id='submit'/><!--\n";
+        content += "\t\t--><input type='submit' name='cancel' value='Annuler' id='cancel'/>\n";
+        content += "\t</div>\n";
+        content += "\n";
+        content += "</form>\n";
+        content += "<span class='requis'>*</span> Champ requis";
         return content;
     }
 

@@ -263,7 +263,7 @@ public class ProjectFileWriter {
             bw.flush();
             bw.close();
         }catch(Exception e){
-            System.out.println(Colors.COLOR_ERROR + "error" + Colors.COLOR_RESET + " " + this.projecFolder + "dbScripts\\" + "create.sql" + e.getMessage());
+            System.out.println(Colors.COLOR_ERROR + "error" + Colors.COLOR_RESET + " " + this.projecFolder + "dbScripts\\" + "create.sql : " + e.getMessage());
         }
     }
 

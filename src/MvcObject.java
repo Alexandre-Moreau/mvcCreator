@@ -25,11 +25,21 @@ public class MvcObject extends MvcTopObject {
     }
 
     public void setAttributes(ArrayList<String[]> attributes) {
-        this.attributes = attributes;
+        for (String[] attr: attributes) {
+            this.addAtribute(attr);
+        }
     }
 
     public void addAtribute(String[] attribute){
-        this.attributes.add(attribute);
+        String[] attr = new String[3];
+        attr[0] = attribute[0];
+        if(attribute[1].matches("string.*")){
+            attr[1] = attribute[1].substring(0, 6);
+            attr[2] = attribute[1].substring(6); //longueur
+        }else{
+            attr[1] = attribute[1];
+        }
+        this.attributes.add(attr);
     }
 
     @Override
@@ -60,10 +70,9 @@ public class MvcObject extends MvcTopObject {
 
     public String toStringSql(){
         String name = this.getName().substring(0, 1).toLowerCase() + this.getName().substring(1);
-        int i = 0;
         String content = "";
         content += "CREATE TABLE " + name + " (\n";
-        content += "\tid int,\n";
+        content += "\tid int AUTO_INCREMENT,\n";
         for (String[] attribute: this.attributes) {
             String type = "";
             switch (attribute[1]){
@@ -72,19 +81,13 @@ public class MvcObject extends MvcTopObject {
                     break;
                 case "int":
                     type = "int";
+                    break;
                 default:
-                    if(attribute[1].matches("string.*")){
-                        type = "varchar(" + attribute[1].substring(6) + ")  DEFAULT ''";
-                    }
                     break;
             }
-            content += "\t" + attribute[0] + " " + type + "";
-            if(i<this.attributes.size()-1){
-                content += ",";
-            }
-            content += "\n";
-            i ++;
+            content += "\t" + attribute[0] + " " + type + ",\n";
         }
+        content += "\tCONSTRAINT pk_" + this.getName().toLowerCase() + "_id PRIMARY KEY (id)\n";
         content += ");";
         return content;
     }
