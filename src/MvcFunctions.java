@@ -7,12 +7,20 @@ public abstract class MvcFunctions {
     public static String construct(MvcObject object) {
         String content = "\tpublic function __construct(";
         for (String[] attribute: object.getAttributes()) {
-            content += "$p" + attribute[0].substring(0, 1).toUpperCase() + attribute[0].substring(1) + ", ";
+            if(object.isFk(attribute)){
+                content += "$p" + Utils.firstUpper(object.fkShortName(attribute[0])) + ", ";
+            }else{
+                content += "$p" + Utils.firstUpper(attribute[0]) + ", ";
+            }
         }
         content += "$pId = null){\n";
         content += "\t\t$this->id = $pId;\n";
         for (String[] attribute: object.getAttributes()) {
-            content += "\t\t$this->" + attribute[0] + " = $p" + attribute[0].substring(0, 1).toUpperCase() + attribute[0].substring(1) + ";\n";
+            if(object.isFk(attribute)){
+                content += "\t\t$this->" + object.fkShortName(attribute[0]) + " = $p" + Utils.firstUpper(object.fkShortName(attribute[0])) + ";\n";
+            }else{
+                content += "\t\t$this->" + attribute[0] + " = $p" + Utils.firstUpper(attribute[0]) + ";\n";
+            }
         }
         content += "\t}\n";
         return content;
@@ -26,11 +34,19 @@ public abstract class MvcFunctions {
         content += "\t\t\t$row = $query->fetch(PDO::FETCH_ASSOC);\n";
         content += "\t\t\t$id = $row['id'];\n";
         for (String[] attribute: object.getAttributes()) {
-            content += "\t\t\t$" + attribute[0] + " = $row['" + attribute[0] + "'];\n";
+            if(object.isFk(attribute)) {
+                content += "\t\t\t$" + object.fkShortName(attribute[0]) + " = " + Utils.firstUpper(object.fkShortName(attribute[0])) + "::FindById($row['" + attribute[0] + "']);\n";
+            }else{
+                content += "\t\t\t$" + attribute[0] + " = $row['" + attribute[0] + "'];\n";
+            }
         }
         content += "\t\t\treturn new " + object.getName() + "(";
         for (String[] attribute: object.getAttributes()) {
-            content += "$" + attribute[0] + ", ";
+            if(object.isFk(attribute)){
+                content += "$" + object.fkShortName(attribute[0]) + ", ";
+            }else{
+                content += "$" + attribute[0] + ", ";
+            }
         }
         content += "$id);\n";
         content += "\t\t}\n";
@@ -63,6 +79,8 @@ public abstract class MvcFunctions {
         for (String[] attribute: object.getAttributes()) {
             if(attribute[1] == "string"){
                 content += ", '\".$" + name + "->" + attribute[0] + ".\"'";
+            }else if(object.isFk(attribute)){
+                content += ", \".$" + name + "->" + object.fkShortName(attribute[0]) + "->id.\"";
             }else{
                 content += ", \".$" + name + "->" + attribute[0] + ".\"";
             }
@@ -83,6 +101,8 @@ public abstract class MvcFunctions {
         for (String[] attribute: object.getAttributes()) {
             if(attribute[1] == "string"){
                 content += attribute[0] + "='\".$" + name + "->" + attribute[0] + ".\"'";
+            }else if(object.isFk(attribute)){
+                content += attribute[0] + "=\".$" + name + "->" + object.fkShortName(attribute[0]) + "->id.\"";
             }else{
                 content += attribute[0] + "=\".$" + name + "->" + attribute[0] + ".\"";
             }

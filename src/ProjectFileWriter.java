@@ -246,17 +246,47 @@ public class ProjectFileWriter {
             BufferedWriter bw = new BufferedWriter(fw);
 
             bw.write("/* Auto-generated file */\n");
-            for(int i = objects.size() - 1; i >= 0; i--){
-                String name = objects.get(i).getName().substring(0, 1).toLowerCase() + objects.get(i).getName().substring(1);
-                bw.write("DROP TABLE IF EXISTS " + name + ";");
-                bw.newLine();
+            for (MvcObject object : objects) {
+                if(object.containsFk()){
+                    bw.write("DROP TABLE IF EXISTS " + object.getNameCamelCase() + ";");
+                    bw.newLine();
+                }
+            }
+            for (MvcObject object : objects) {
+                if(!object.containsFk()){
+                    bw.write("DROP TABLE IF EXISTS " + object.getNameCamelCase() + ";");
+                    bw.newLine();
+                }
             }
             bw.newLine();
             for (MvcObject object : objects) {
-                String rawContent = object.toStringSql();
-                String[] content = rawContent.split("\n");
-                for (String line : content) {
-                    bw.write(line);
+                if(!object.containsFk()){
+                    String rawContent = object.toStringSql();
+                    String[] content = rawContent.split("\n");
+                    for (String line : content) {
+                        bw.write(line);
+                        bw.newLine();
+                    }
+                    bw.newLine();
+                }
+                if(object.containsFk()){
+                    String rawContent = object.toStringSql();
+                    String[] content = rawContent.split("\n");
+                    for (String line : content) {
+                        bw.write(line);
+                        bw.newLine();
+                    }
+                    bw.newLine();
+                }
+            }
+            for (MvcObject object : objects) {
+                if(object.containsFk()) {
+                    String rawContent = object.toStringForeignKeys();
+                    String[] content = rawContent.split("\n");
+                    for (String line : content) {
+                        bw.write(line);
+                        bw.newLine();
+                    }
                     bw.newLine();
                 }
             }

@@ -22,19 +22,32 @@ public class Main {
 
         // --
 
-        MvcObject client = new MvcObject("Client");
-        client.addAtribute(new String[]{"nom","string"});
-        client.addAtribute(new String[]{"prenom","string"});
-        client.addAtribute(new String[]{"age","int"});
-        objects.add(client);
-
-        MvcObject produit = new MvcObject("Produit");
-        produit.addAtribute(new String[]{"nom","string50"});
-        produit.addAtribute(new String[]{"marque","string20"});
-        produit.addAtribute(new String[]{"prix","int"});
-        objects.add(produit);
+        MvcObject article = new MvcObject("Article");
+        article.addAtribute(new String[]{"nom","string","25"});
+        article.addAtribute(new String[]{"chemin","string","50"});
+        article.addAtribute(new String[]{"type","int"});
+        objects.add(article);
 
         MvcTopObject.createControllersFromObjects(controllers, objects);
+
+        MvcObject terme = new MvcObject("Terme");
+        terme.addAtribute(new String[]{"motCle","string"});
+        objects.add(terme);
+
+        MvcObject langue = new MvcObject("Langue");
+        langue.addAtribute(new String[]{"nom","string"});
+        objects.add(langue);
+
+        MvcObject concept = new MvcObject("Concept");
+        concept.addAtribute(new String[]{"nom","string"});
+        concept.addAtribute(langue);
+        objects.add(concept);
+
+        MvcObject reference = new MvcObject("Reference");
+        reference.addAtribute(new String[]{"nombreRef","int"});
+        reference.addAtribute(article);
+        reference.addAtribute(concept);
+        objects.add(reference);
 
         // --
 
@@ -46,8 +59,9 @@ public class Main {
 
         for (MvcObject object: objects){
             fileWriter.write(object);
-            fileWriter.writeSql(objects);
         }
+
+        fileWriter.writeSql(objects);
 
         for (String fileName: fileNames){
             fileWriter.writeFile(fileName);
