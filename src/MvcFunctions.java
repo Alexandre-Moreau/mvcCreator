@@ -56,7 +56,7 @@ public abstract class MvcFunctions {
     }
 
     public static String findAll(MvcObject object) {
-        String content = "\tstatic public function findAll($pId){\n";
+        String content = "\tstatic public function findAll(){\n";
         content += "\t\t$query = db()->prepare(\"SELECT id FROM \".self::$tableName);\n";
         content += "\t\t$query->execute();\n";
         content += "\t\t$returnList = array();\n";
